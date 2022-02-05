@@ -1,0 +1,4 @@
+import httpx
+
+class SpotifyClient:
+

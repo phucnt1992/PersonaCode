@@ -1,0 +1,7 @@
+# Linting Tools
+black
+flake8
+
+# DB Tools
+alembic
+asyncpg
