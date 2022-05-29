@@ -5,7 +5,7 @@ from types import coroutine
 
 from aioresponses import aioresponses
 from music.services.spotify import AsyncSpotifyClient
-from pytest_bdd import given, scenario, then, when
+from pytest_bdd import scenario, then, when
 
 from .factories import MarketFactory
 
@@ -13,12 +13,6 @@ from .factories import MarketFactory
 @scenario("getMarketsFromSpotify.feature", "Get the markets data")
 def test_get_the_markets_data():
     """Get the markets data."""
-    pass
-
-
-@given("system has client credentials")
-def system_has_client_credentials():
-    """system has client credentials."""
     pass
 
 

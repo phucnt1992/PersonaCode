@@ -1,8 +1,8 @@
-from aioresponses import aioresponses
 import pytest
 import pytest_asyncio
-
+from aioresponses import aioresponses
 from music.services.spotify import AsyncSpotifyClient
+from pytest_bdd import given
 
 from .factories.spotify_credential_factory import SpotifyCredentialFactory
 
@@ -22,3 +22,9 @@ def auth_aioresponse():
 async def create_spotify_client():
     async with AsyncSpotifyClient("test_client_id", "test_client_secret") as s:
         yield s
+
+
+@given("system has client credentials")
+def system_has_client_credentials():
+    """system has client credentials."""
+    pass

@@ -3,7 +3,7 @@ from __future__ import annotations
 from types import TracebackType
 from typing import List, Optional, Type
 
-from music.types import Market
+from music.types import Market, Genre
 from spotipy2 import Spotify
 from spotipy2.auth import ClientCredentialsFlow
 
@@ -33,7 +33,12 @@ class AsyncSpotifyClient:
             albums = await s.get_albums()
             return albums
 
-    async def get_available_markets(self) -> List[str]:
+    async def get_available_markets(self) -> List[Market]:
         async with self._client as s:
             markets = await s._get("markets")
             return [Market.from_dict(m) for m in markets["markets"]]
+
+    async def get_genres(self) -> List[Genre]:
+        async with self._client as s:
+            genres = await s._get("recommendations/available-genre-seeds")
+            return [Genre.from_dict(g) for g in genres["genres"]]

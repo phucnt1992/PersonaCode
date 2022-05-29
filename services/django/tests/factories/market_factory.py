@@ -1,5 +1,5 @@
 import factory
-from music.types.market import Market
+from music.types import Market
 
 
 class MarketFactory(factory.Factory):
