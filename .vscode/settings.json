@@ -6,12 +6,27 @@
     "**/CVS": true,
     "**/.DS_Store": true,
     "**/Thumbs.db": true,
-    "**/__pycache__": true
+    "**/__pycache__": true,
+    "**/bin": true,
+    "**/obj": true
   },
   "python.formatting.provider": "black",
   "python.linting.flake8Enabled": true,
   "python.linting.enabled": true,
   "python.linting.flake8Args": [
     "--config=./config/.flake8"
-  ]
+  ],
+  "cSpell.words": [
+    "aclose",
+    "aiohttp",
+    "aioresponse",
+    "aioresponses",
+    "httpx",
+    "lexify",
+    "spotipy",
+    "usefixtures"
+  ],
+  "python.testing.cwd": "${workspaceFolder}/services/django",
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
 }

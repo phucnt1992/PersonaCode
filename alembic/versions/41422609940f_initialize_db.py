@@ -7,9 +7,9 @@ Create Date: 2022-01-28 16:35:09.748085
 """
 import csv
 import os
-from alembic import op
-import sqlalchemy as sa
 
+import sqlalchemy as sa
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "41422609940f"
@@ -128,7 +128,7 @@ def upgrade():
         sa.Column("width", sa.Integer(), nullable=False, default=300),
         sa.Column(
             "source_id",
-            sa.BigInteger(),
+            sa.SmallInteger(),
             sa.ForeignKey(
                 "sources.id",
                 name="source_images_source_id_fkey",
@@ -150,14 +150,13 @@ def upgrade():
     op.create_table(
         "albums",
         sa.Column("id", sa.BigInteger(), primary_key=True, autoincrement=True),
-        sa.Column("external_id", sa.String(36)),
+        sa.Column("external_id", sa.String(36), nullable=False),
         sa.Column("name", sa.String(length=300), nullable=False),
         sa.Column("uri", sa.String(length=300), nullable=True),
         sa.Column("release_date", sa.String(length=10), nullable=False),
         sa.Column("release_date_precision", sa.String(length=1), nullable=False),
         sa.Column("total_tracks", sa.SmallInteger(), nullable=False),
         sa.Column("href", sa.String(length=2048), nullable=False),
-        sa.Column("external_urls", sa.dialects.postgresql.HSTORE(), nullable=True),
         sa.Column(
             "album_type_id",
             sa.SmallInteger(),
@@ -207,7 +206,70 @@ def upgrade():
         ),
         sa.Column("url", sa.String(length=2048), nullable=False),
     )
-    op.create_index("albums_external_id_idx", "albums", ["external_id"])
+    op.create_index(
+        "albums_external_url_idx",
+        "album_external_urls",
+        ["album_external_urls_album_id_fkey", "album_external_urls_source_id_fkey"],
+    )
+
+    op.create_table(
+        "album_genres",
+        sa.Column("id", sa.BigInteger(), primary_key=True, autoincrement=True),
+        sa.Column(
+            "album_id",
+            sa.SmallInteger(),
+            sa.ForeignKey(
+                "albums.id",
+                name="album_genres_album_id_fkey",
+                ondelete="CASCADE",
+            ),
+            nullable=False,
+        ),
+        sa.Column(
+            "genre_id",
+            sa.SmallInteger(),
+            sa.ForeignKey(
+                "generes.id",
+                name="source_genres_genre_id_fkey",
+                ondelete="CASCADE",
+            ),
+            nullable=False,
+        ),
+    )
+    op.create_index(
+        "album_genres_idx",
+        "album_genres",
+        ["album_genres_album_id_fkey", "source_genres_genre_id_fkey"],
+    )
+
+    op.create_table(
+        "album_images",
+        sa.Column(
+            "album_id",
+            sa.SmallInteger(),
+            sa.ForeignKey(
+                "albums.id",
+                name="album_images_album_id_fkey",
+                ondelete="CASCADE",
+            ),
+            nullable=False,
+        ),
+        sa.Column(
+            "image_id",
+            sa.SmallInteger(),
+            sa.ForeignKey(
+                "images.id",
+                name="source_images_image_id_fkey",
+                ondelete="CASCADE",
+            ),
+            nullable=False,
+        ),
+    )
+    op.create_index(
+        "album_images_idx",
+        "album_images",
+        ["album_images_album_id_fkey", "source_images_image_id_fkey"],
+    )
 
     op.create_table(
         "album_markets",
@@ -257,15 +319,16 @@ def upgrade():
 
 
 def downgrade():
-    op.drop_index("albums_external_id_idx")
-    op.drop_table("albums_markets")
+    op.drop_table("album_markets")
     op.drop_table("album_types")
+    op.drop_table("album_external_urls")
+    op.drop_table("album_genres")
+    op.drop_table("album_images")
     op.drop_table("albums")
 
     op.drop_table("source_markets")
     op.drop_table("countries")
 
-    op.drop_index("source_genres_source_id_genre_id_idx")
     op.drop_table("source_genres")
     op.drop_table("genres")
 

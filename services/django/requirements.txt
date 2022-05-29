@@ -1,4 +1,13 @@
 Django
 djangorestframework
 django-extensions
-httpx
+aiohttp[speedups]
+aioresponses
+spotipy2
+
+# Test
+factory_boy
+faker_music
+pytest-django
+pytest-asyncio
+pytest-bdd
