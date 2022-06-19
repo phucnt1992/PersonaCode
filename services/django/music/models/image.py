@@ -5,7 +5,7 @@ from ._base import BaseAuditModel
 
 class Image(BaseAuditModel):
     class Meta:
-        db_table = "images"
+        db_table = 'music"."images'
         managed = False
 
     id = models.BigAutoField(_("id"), primary_key=True)

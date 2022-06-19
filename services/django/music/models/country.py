@@ -1,12 +1,12 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from ._base import BaseDefinitionModel
+from ._base import BaseDefinitionModel, include_schema
 
 
 class Country(BaseDefinitionModel):
     class Meta:
-        db_table = "countries"
+        db_table = include_schema("countries")
         managed = False
 
     alpha_2 = models.CharField(_("alpha_2"), max_length=2, null=False)

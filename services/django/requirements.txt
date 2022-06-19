@@ -4,6 +4,7 @@ django-extensions
 aiohttp[speedups]
 aioresponses
 spotipy2
+psycopg2
 
 # Test
 factory_boy

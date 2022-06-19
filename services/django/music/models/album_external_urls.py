@@ -1,10 +1,11 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from ._base import include_schema
 
 
 class AlbumExternalUrl(models.Model):
     class Meta:
-        db_table = "album_external_urls"
+        db_table = include_schema("album_external_urls")
         managed = False
 
     id = models.BigAutoField(_("id"), primary_key=True)

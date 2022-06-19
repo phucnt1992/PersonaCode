@@ -21,8 +21,12 @@ FIXTURES_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "fixtures"
 )
 
+DEFAULT_SCHEMA = "music"
+
 
 def upgrade():
+    op.execute(f"CREATE SCHEMA IF NOT EXISTS {DEFAULT_SCHEMA};")
+
     audit_columns = [
         sa.Column(
             "created_at",
@@ -44,6 +48,7 @@ def upgrade():
         "sources",
         *master_columns,
         sa.UniqueConstraint("name", name="source_name_key"),
+        schema=DEFAULT_SCHEMA,
     )
 
     countries_table = op.create_table(
@@ -59,12 +64,14 @@ def upgrade():
         sa.Column("region_code", sa.String(length=3), nullable=True),
         sa.Column("sub_region_code", sa.String(length=3), nullable=True),
         sa.Column("intermediate_region_code", sa.String(length=3), nullable=True),
+        schema=DEFAULT_SCHEMA,
     )
 
     op.create_table(
         "genres",
         *master_columns,
         sa.UniqueConstraint("name", name="genres_name_key"),
+        schema=DEFAULT_SCHEMA,
     )
 
     op.create_table(
@@ -73,7 +80,7 @@ def upgrade():
             "source_id",
             sa.SmallInteger(),
             sa.ForeignKey(
-                "sources.id",
+                f"{DEFAULT_SCHEMA}.sources.id",
                 name="source_genres_source_id_fkey",
                 ondelete="CASCADE",
             ),
@@ -83,17 +90,19 @@ def upgrade():
             "genre_id",
             sa.SmallInteger(),
             sa.ForeignKey(
-                "genres.id",
+                f"{DEFAULT_SCHEMA}.genres.id",
                 name="source_genres_genre_id_fkey",
-                eondelete="CASCADE",
+                ondelete="CASCADE",
             ),
             nullable=False,
         ),
+        schema=DEFAULT_SCHEMA,
     )
     op.create_index(
         "source_genres_source_id_genre_id_idx",
         "source_genres",
         ["source_id", "genre_id"],
+        schema=DEFAULT_SCHEMA,
     )
 
     op.create_table(
@@ -102,7 +111,7 @@ def upgrade():
             "source_id",
             sa.SmallInteger(),
             sa.ForeignKey(
-                "sources.id",
+                f"{DEFAULT_SCHEMA}.sources.id",
                 name="source_markets_source_id_fkey",
                 ondelete="CASCADE",
             ),
@@ -112,12 +121,13 @@ def upgrade():
             "country_id",
             sa.SmallInteger(),
             sa.ForeignKey(
-                "countries.id",
+                f"{DEFAULT_SCHEMA}.countries.id",
                 name="source_markets_country_id_fkey",
                 ondelete="CASCADE",
             ),
             nullable=False,
         ),
+        schema=DEFAULT_SCHEMA,
     )
 
     op.create_table(
@@ -127,10 +137,10 @@ def upgrade():
         sa.Column("height", sa.Integer(), nullable=False, default=300),
         sa.Column("width", sa.Integer(), nullable=False, default=300),
         sa.Column(
-            "source_id",
+            f"{DEFAULT_SCHEMA}.ource_id",
             sa.SmallInteger(),
             sa.ForeignKey(
-                "sources.id",
+                f"{DEFAULT_SCHEMA}.sources.id",
                 name="source_images_source_id_fkey",
                 ondelete="CASCADE",
             ),
@@ -138,6 +148,7 @@ def upgrade():
         ),
         *audit_columns,
         sa.UniqueConstraint("url", name="images_url_key"),
+        schema=DEFAULT_SCHEMA,
     )
 
     # Album Tables
@@ -145,6 +156,7 @@ def upgrade():
         "album_types",
         *master_columns,
         sa.UniqueConstraint("name", name="album_types_name_key"),
+        schema=DEFAULT_SCHEMA,
     )
 
     op.create_table(
@@ -161,7 +173,7 @@ def upgrade():
             "album_type_id",
             sa.SmallInteger(),
             sa.ForeignKey(
-                "album_types.id",
+                f"{DEFAULT_SCHEMA}.album_types.id",
                 name="albums_album_type_id_fkey",
                 ondelete="CASCADE",
             ),
@@ -171,15 +183,21 @@ def upgrade():
             "source_id",
             sa.SmallInteger(),
             sa.ForeignKey(
-                "sources.id",
+                f"{DEFAULT_SCHEMA}.sources.id",
                 name="albums_source_id_fkey",
                 ondelete="CASCADE",
             ),
             nullable=False,
         ),
         *audit_columns,
+        schema=DEFAULT_SCHEMA,
     )
-    op.create_index("albums_external_id_idx", "albums", ["external_id"])
+    op.create_index(
+        "albums_external_id_idx",
+        "albums",
+        ["external_id"],
+        schema=DEFAULT_SCHEMA,
+    )
 
     op.create_table(
         "album_external_urls",
@@ -188,7 +206,7 @@ def upgrade():
             "album_id",
             sa.BigInteger(),
             sa.ForeignKey(
-                "albums.id",
+                f"{DEFAULT_SCHEMA}.albums.id",
                 name="album_external_urls_album_id_fkey",
                 ondelete="CASCADE",
             ),
@@ -198,18 +216,20 @@ def upgrade():
             "source_id",
             sa.SmallInteger(),
             sa.ForeignKey(
-                "sources.id",
+                f"{DEFAULT_SCHEMA}.sources.id",
                 name="album_external_urls_source_id_fkey",
                 ondelete="CASCADE",
             ),
             nullable=False,
         ),
         sa.Column("url", sa.String(length=2048), nullable=False),
+        schema=DEFAULT_SCHEMA,
     )
     op.create_index(
         "albums_external_url_idx",
         "album_external_urls",
-        ["album_external_urls_album_id_fkey", "album_external_urls_source_id_fkey"],
+        ["album_id", "source_id"],
+        schema=DEFAULT_SCHEMA,
     )
 
     op.create_table(
@@ -219,7 +239,7 @@ def upgrade():
             "album_id",
             sa.SmallInteger(),
             sa.ForeignKey(
-                "albums.id",
+                f"{DEFAULT_SCHEMA}.albums.id",
                 name="album_genres_album_id_fkey",
                 ondelete="CASCADE",
             ),
@@ -229,17 +249,19 @@ def upgrade():
             "genre_id",
             sa.SmallInteger(),
             sa.ForeignKey(
-                "generes.id",
+                f"{DEFAULT_SCHEMA}.genres.id",
                 name="source_genres_genre_id_fkey",
                 ondelete="CASCADE",
             ),
             nullable=False,
         ),
+        schema=DEFAULT_SCHEMA,
     )
     op.create_index(
         "album_genres_idx",
         "album_genres",
-        ["album_genres_album_id_fkey", "source_genres_genre_id_fkey"],
+        ["album_id", "genre_id"],
+        schema=DEFAULT_SCHEMA,
     )
 
     op.create_table(
@@ -248,7 +270,7 @@ def upgrade():
             "album_id",
             sa.SmallInteger(),
             sa.ForeignKey(
-                "albums.id",
+                f"{DEFAULT_SCHEMA}.albums.id",
                 name="album_images_album_id_fkey",
                 ondelete="CASCADE",
             ),
@@ -258,17 +280,19 @@ def upgrade():
             "image_id",
             sa.SmallInteger(),
             sa.ForeignKey(
-                "images.id",
+                f"{DEFAULT_SCHEMA}.images.id",
                 name="source_images_image_id_fkey",
                 ondelete="CASCADE",
             ),
             nullable=False,
         ),
+        schema=DEFAULT_SCHEMA,
     )
     op.create_index(
         "album_images_idx",
         "album_images",
-        ["album_images_album_id_fkey", "source_images_image_id_fkey"],
+        ["album_id", "image_id"],
+        schema=DEFAULT_SCHEMA,
     )
 
     op.create_table(
@@ -277,7 +301,7 @@ def upgrade():
             "album_id",
             sa.BigInteger(),
             sa.ForeignKey(
-                "albums.id",
+                f"{DEFAULT_SCHEMA}.albums.id",
                 name="album_markets_album_id_fkey",
                 ondelete="CASCADE",
             ),
@@ -287,12 +311,13 @@ def upgrade():
             "country_id",
             sa.SmallInteger(),
             sa.ForeignKey(
-                "countries.id",
+                f"{DEFAULT_SCHEMA}.countries.id",
                 name="album_markets_country_id_fkey",
                 ondelete="CASCADE",
             ),
             nullable=False,
         ),
+        schema=DEFAULT_SCHEMA,
     )
 
     # SEEDING DATA
@@ -302,37 +327,21 @@ def upgrade():
         for row in csv_reader:
             countries_data.append(
                 {
-                    "name": row[0],
-                    "alpha_2": row[1],
-                    "alpha_3": row[2],
-                    "country_code": row[3],
-                    "iso_3166_2": row[4],
-                    "region": row[5],
-                    "sub_region": row[6],
-                    "intermediate_region": row[7],
-                    "region_code": row[8],
-                    "sub_region_code": row[9],
-                    "intermediate_region_code": row[10],
+                    "name": row["name"],
+                    "alpha_2": row["alpha-2"],
+                    "alpha_3": row["alpha-3"],
+                    "country_code": row["country-code"],
+                    "iso_3166_2": row["iso_3166-2"],
+                    "region": row["region"],
+                    "sub_region": row["sub-region"],
+                    "intermediate_region": row["intermediate-region"],
+                    "region_code": row["region-code"],
+                    "sub_region_code": row["sub-region-code"],
+                    "intermediate_region_code": row["intermediate-region-code"],
                 }
             )
         op.bulk_insert(table=countries_table, rows=countries_data)
 
 
 def downgrade():
-    op.drop_table("album_markets")
-    op.drop_table("album_types")
-    op.drop_table("album_external_urls")
-    op.drop_table("album_genres")
-    op.drop_table("album_images")
-    op.drop_table("albums")
-
-    op.drop_table("source_markets")
-    op.drop_table("countries")
-
-    op.drop_table("source_genres")
-    op.drop_table("genres")
-
-    op.drop_table("source_images")
-    op.drop_table("images")
-
-    op.drop_table("sources")
+    op.execute(f"DROP SCHEMA IF EXISTS {DEFAULT_SCHEMA} CASCADE")
