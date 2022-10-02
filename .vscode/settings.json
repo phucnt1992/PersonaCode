@@ -33,4 +33,8 @@
   "python.testing.cwd": "${workspaceFolder}/services/django",
   "python.testing.pytestEnabled": true,
   "python.testing.unittestEnabled": false,
+  "sonarlint.connectedMode.project": {
+    "connectionId": "phucnt1992",
+    "projectKey": "phucnt1992_PersonaCode"
+  },
 }
