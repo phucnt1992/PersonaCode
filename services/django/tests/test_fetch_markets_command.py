@@ -1,12 +1,11 @@
 """Fetch Markets Command feature tests."""
+
 from io import StringIO
 
 import pytest
 from aioresponses import aioresponses
 from django.core.management import call_command
 from pytest_bdd import parsers, scenario, then, when
-
-from music.models.source import Source
 
 from .factories import MarketFactory
 
@@ -50,4 +49,7 @@ def the_output_should_return_successful_message(command_result: str):
 
 @then("the new markets should be stored in db")
 def the_new_markets_should_be_stored_in_db():
+    # import here to avoid circular import at module import time
+    from music.models.source import Source
+
     assert Source.objects.get(pk=1).markets.count() == 10

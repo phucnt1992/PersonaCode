@@ -1,0 +1,21 @@
+[project]
+name = "personacode"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["pip>=25.2"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+[tool.coverage.report]
+omit = [
+    "*/tests/*",
+    "*/migrations/*",
+    "*/__init__.py",
+    "*/settings/*",
+    "*/wsgi.py",
+    "*/asgi.py",
+    "*/manage.py",
+]

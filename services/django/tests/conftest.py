@@ -1,14 +1,16 @@
+import asyncio
 import logging
 import os
 import warnings
 
-import alembic
 import pytest
 import pytest_asyncio
 from aioresponses import aioresponses
-from alembic.config import Config
 from music.services import AsyncSpotifyClient
 from pytest_bdd import given
+
+import alembic
+from alembic.config import Config
 
 from .factories.spotify_credential_factory import SpotifyCredentialFactory
 
@@ -17,6 +19,16 @@ BASE_DIR = os.path.dirname(
 )
 
 LOGGER = logging.getLogger(__name__)
+
+
+@pytest.fixture(scope="session")
+def event_loop():
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+    yield loop
+    loop.close()
 
 
 @pytest.fixture(scope="session")

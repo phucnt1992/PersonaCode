@@ -4,7 +4,7 @@ django-extensions
 aiohttp[speedups]
 aioresponses
 spotipy2
-psycopg2
+psycopg2-binary
 
 # Test
 factory_boy
@@ -12,3 +12,5 @@ faker_music
 pytest-django
 pytest-asyncio
 pytest-bdd
+pytest-async
+pytest-cov
